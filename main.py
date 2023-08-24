@@ -78,7 +78,7 @@ def get_spread(v, deck):
         elif len(index) >= 3:
             break
     for i in range(len(index)):
-        v[i] = deck[i]
+        v[index[i]] = deck[i]
     deck = deck[3:]
     if len(deck) <= 18 and len(sets) == 0:
         return "done"
