@@ -71,12 +71,12 @@ def get_spread(deck):
     deck_new = deck[12:]
     subsets = list(combo(v, 3))
     sets = find_set(subsets)
-    if len(sets) == 0:
+    if len(sets) == 0 and len(deck_new) >= 3:
         v = np.append(v, deck[:3])
         deck_new = deck_new[3:]
         subsets = list(combo(v, 3))
         sets = find_set(subsets)
-        if len(sets) == 0:
+        if len(sets) == 0 and len(deck_new >= 3):
             v = np.append(v, deck[:3])
             deck_new = deck_new[3:]
             subsets = list(combo(v, 3))
@@ -92,8 +92,13 @@ def get_spread(deck):
     for k in range(len(indices)):
         v[int(indices[k])] = deck_new[k]
     new_deck = np.append(v, deck_new[len(indices):])
+    new_deck = np.reshape(new_deck, (int(len(new_deck)/4), 4))
+
 
     if len(deck_new[len(indices):]) <= 18 and len(sets) == 0:
         return "Yay!"
-    get_spread(new_deck)
+    else:
+        get_spread(new_deck)
+
+
 get_spread(get_deck())
