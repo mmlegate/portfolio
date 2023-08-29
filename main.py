@@ -43,62 +43,76 @@ def get_deck():
     return deck
 
 
-def find_set(subsets):
-    # v is the set of all combinations of a group of cards
-    indices = []
-    sets_indices = []
-    sets = []
-    v = subsets.copy()
-    for i in range(len(v)):
-        for j in range(4):
-            if (v[i][0][j] == v[i][1][j] == v[i][2][j]) or (v[i][0][j] != v[i][1][j] and v[i][0][j] != v[i][2][j]):
-                indices = np.append(indices, i)
-            else:
+def find_set(spread):
+    subsets = list(combo(spread,3))
+    if len(subsets) == 0:
+        return "End of Deck."
+    else:
+        n = len(subsets)
+        indices = np.zeros(n)
+        for i in range(n):
+            for j in range(4):
+                if (subsets[i][0][j] == subsets[i][1][j] == subsets[i][2][j]) or (subsets[i][0][j] != subsets[i][1][j] != subsets[i][2][j] != subsets[i][0][j]):
+                    indices[i] += 1
+                else:
+                    break
+        for i in range(n):
+            if indices[i] >= 4:
+                set_index = i
                 break
-        if len(indices) >= 4:
-            for i in range(len(indices) - 4):
-                if indices[i] == indices[i + 1] == indices[i + 2] == indices[i + 3]:
-                    sets_indices = np.append(sets_indices, indices[i])
-        sets_indices = np.unique(sets_indices)
-        for i in range(len(sets_indices)):
-            sets = np.append(sets, v[int(sets_indices[i])])
-        sets = np.reshape(sets, (int(len(sets) / 12), 3, 4))
+    if set_index == 0:
+        sets = []
+    else:
+        sets = subsets[set_index]
     return sets
 
 
 def get_spread(deck):
-    v = deck[:12]
-    deck_new = deck[12:]
-    subsets = list(combo(v, 3))
-    sets = find_set(subsets)
-    if len(sets) == 0 and len(deck_new) >= 3:
-        v = np.append(v, deck[:3])
-        deck_new = deck_new[3:]
-        subsets = list(combo(v, 3))
-        sets = find_set(subsets)
-        if len(sets) == 0 and len(deck_new >= 3):
-            v = np.append(v, deck[:3])
-            deck_new = deck_new[3:]
-            subsets = list(combo(v, 3))
-            sets = find_set(subsets)
-
-    key = sets[0]
-    indices = []
-    for i in range(3):
-        for j in range(len(v)):
-            for k in range(4):
-                if key[i][k] == v[j][k]:
-                    indices = np.append(indices, j)
-    for k in range(len(indices)):
-        v[int(indices[k])] = deck_new[k]
-    new_deck = np.append(v, deck_new[len(indices):])
-    new_deck = np.reshape(new_deck, (int(len(new_deck)/4), 4))
-
-
-    if len(deck_new[len(indices):]) <= 18 and len(sets) == 0:
-        return "Yay!"
+    if len(deck) <= 12:
+        spread = deck.copy()
+        sets = find_set(spread)
+        if len(sets) == 0:
+            return "Yippee"
+        key = sets[0]
+        counts = np.zeros(len(spread))
+        for i in range(len(spread)):
+            for j in range(3):
+                for k in range(4):
+                    if key[j][k] == spread[i][k]:
+                        counts[i] += 1
+        for i in range(len(spread)):
+            if counts[i] >= 4:
+                spread_new = np.remove(spread, i)
+        get_spread(spread_new)
     else:
-        get_spread(new_deck)
+        spread = deck[:12]
+        deck_new = deck[12:]
+        sets = find_set(spread)
+        if len(sets) == 0 and len(deck_new) >= 3:
+            spread = np.append(spread, deck[:3])
+            deck_new = deck_new[3:]
+            sets = find_set(spread)
+            if len(sets) == 0 and len(deck_new >= 3):
+                spread = np.append(spread, deck[:3])
+                deck_new = deck_new[3:]
+                sets = find_set(spread)
+            elif len(sets) == 0 and len(deck_new) < 3:
+                return "Yurpee"
+        elif len(sets) == 0 and len(deck_new) < 3:
+            return "Yorpee"
+        key = sets[0]
+        indices = np.zeros(len(spread))
+        for i in range(3):
+            for j in range(len(spread)):
+                for k in range(4):
+                    if key[i][k] == spread[j][k]:
+                        indices[j] += 1
+        for k in range(len(indices)):
+            if indices[k] >= 4:
+                spread[k] = deck_new[k]
+        new_deck = np.append(spread, deck_new[len(indices):])
+        new_deck = np.reshape(new_deck, (int(len(new_deck)/4), 4))
+        return get_spread(get_deck())
 
 
 get_spread(get_deck())
