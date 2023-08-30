@@ -44,7 +44,7 @@ def get_deck():
 
 
 def find_set(spread):
-    subsets = list(combo(spread,3))
+    subsets = list(combo(spread, 3))
     if len(subsets) == 0:
         return "End of Deck."
     else:
@@ -52,7 +52,8 @@ def find_set(spread):
         indices = np.zeros(n)
         for i in range(n):
             for j in range(4):
-                if (subsets[i][0][j] == subsets[i][1][j] == subsets[i][2][j]) or (subsets[i][0][j] != subsets[i][1][j] != subsets[i][2][j] != subsets[i][0][j]):
+                if (subsets[i][0][j] == subsets[i][1][j] == subsets[i][2][j]) or (
+                        subsets[i][0][j] != subsets[i][1][j] != subsets[i][2][j] != subsets[i][0][j]):
                     indices[i] += 1
                 else:
                     break
@@ -60,7 +61,9 @@ def find_set(spread):
             if indices[i] >= 4:
                 set_index = i
                 break
-    if set_index == 0:
+            else:
+                set_index = []
+    if not set_index:
         sets = []
     else:
         sets = subsets[set_index]
@@ -71,48 +74,123 @@ def get_spread(deck):
     if len(deck) <= 12:
         spread = deck.copy()
         sets = find_set(spread)
-        if len(sets) == 0:
-            return "Yippee"
-        key = sets[0]
-        counts = np.zeros(len(spread))
-        for i in range(len(spread)):
-            for j in range(3):
-                for k in range(4):
-                    if key[j][k] == spread[i][k]:
-                        counts[i] += 1
-        for i in range(len(spread)):
-            if counts[i] >= 4:
-                spread_new = np.remove(spread, i)
-        get_spread(spread_new)
+        if not sets:
+            return print("Yippee")
+        else:
+            indices = [0, 0, 0]
+            for i in range(len(spread)):
+                for k in range(3):
+                    card_of_moment = spread[i]
+                    if np.array_equiv(sets[k], card_of_moment):
+                        indices[k] = int(i)
+            spread = np.delete(spread, indices, axis=0)
+            get_spread(spread)
+    elif len(deck) <= 15:
+        spread = deck[:12]
+        deck_new = deck[12:]
+        sets = find_set(spread)
+        if not sets:
+            spread = np.append(spread, deck[:3], axis=0)
+            deck_new = deck[3:]
+            sets = find_set(spread)
+            if not sets:
+                return print("Yuppee")
+            else:
+                indices = [0, 0, 0]
+                for i in range(len(spread)):
+                    for k in range(3):
+                        card_of_moment = spread[i]
+                        if np.array_equiv(sets[k], card_of_moment):
+                            indices[k] = int(i)
+                spread = np.delete(spread, indices, axis=0)
+                get_spread(spread)
+        else:
+            for k in range(3):
+                for i in range(len(spread)):
+                    if np.array_equiv(sets[k], spread[i]):
+                        spread[i] = deck_new[k]
+            deck_new = deck_new[3:]
+            get_spread(spread)
+    elif len(deck) <= 18:
+        spread = deck[12:]
+        deck_new = deck[12:]
+        sets = find_set(spread)
+        if not sets:
+            spread = np.append(spread, deck[:3], axis=0)
+            deck_new = deck[3:]
+            sets = find_set(spread)
+            if not sets:
+                spread = np.append(spread, deck_new[:3], axis=0)
+                deck_new = deck_new[3:]
+                sets = find_set(spread)
+                if not sets:
+                    return print("Yoppee")
+                else:
+                    indices = [0, 0, 0]
+                    for i in range(len(spread)):
+                        for k in range(3):
+                            card_of_moment = spread[i]
+                            if np.array_equiv(sets[k], card_of_moment):
+                                indices[k] = int(i)
+                    spread = np.delete(spread, indices, axis=0)
+                    get_spread(spread)
+            else:
+                for k in range(3):
+                    for i in range(len(spread)):
+                        if np.array_equiv(sets[k], spread[i]):
+                            spread[i] = deck_new[k]
+                deck_new = deck_new[3:]
+                deck = np.concatenate(spread, deck_new, axis=0)
+                get_spread(deck)
     else:
         spread = deck[:12]
         deck_new = deck[12:]
         sets = find_set(spread)
-        if len(sets) == 0 and len(deck_new) >= 3:
-            spread = np.append(spread, deck[:3])
+        if not sets:
+            spread = np.append(spread, deck_new[:3], axis=0)
             deck_new = deck_new[3:]
             sets = find_set(spread)
-            if len(sets) == 0 and len(deck_new >= 3):
-                spread = np.append(spread, deck[:3])
+            if not sets:
+                spread = np.append(spread, deck_new[:3], axis=0)
                 deck_new = deck_new[3:]
                 sets = find_set(spread)
-            elif len(sets) == 0 and len(deck_new) < 3:
-                return "Yurpee"
-        elif len(sets) == 0 and len(deck_new) < 3:
-            return "Yorpee"
-        key = sets[0]
-        indices = np.zeros(len(spread))
-        for i in range(3):
-            for j in range(len(spread)):
-                for k in range(4):
-                    if key[i][k] == spread[j][k]:
-                        indices[j] += 1
-        for k in range(len(indices)):
-            if indices[k] >= 4:
-                spread[k] = deck_new[k]
-        new_deck = np.append(spread, deck_new[len(indices):])
-        new_deck = np.reshape(new_deck, (int(len(new_deck)/4), 4))
-        return get_spread(get_deck())
-
+                if not sets:
+                    spread = np.append(spread, deck_new[:3], axis=0)
+                    deck_new = deck_new[3:]
+                    sets = find_set(spread)
+                    indices = [0, 0, 0]
+                    for k in range(3):
+                        for i in range(len(spread)):
+                            if np.array_equiv(sets[k], spread[i]):
+                                indices[k] = i
+                    spread = np.delete(spread, indices, axis=0)
+                    deck = np.append(spread, deck_new, axis=0)
+                    get_spread(deck)
+                else:
+                    indices = [0, 0, 0]
+                    for k in range(3):
+                        for i in range(len(spread)):
+                            if np.array_equiv(sets[k], spread[i]):
+                                indices[k] = i
+                    spread = np.delete(spread, indices, axis=0)
+                    deck = np.append(spread, deck_new, axis=0)
+                    get_spread(deck)
+            else:
+                indices = [0, 0, 0]
+                for k in range(3):
+                    for i in range(len(spread)):
+                        if np.array_equiv(sets[k], spread[i]):
+                            indices[k] = i
+                spread = np.delete(spread, indices, axis=0)
+                deck = np.append(spread, deck_new, axis=0)
+                get_spread(deck)
+        else:
+            for k in range(3):
+                for i in range(len(spread)):
+                    if np.array_equiv(sets[k], spread[i]):
+                        spread[i] = deck_new[k]
+            deck_new = deck_new[3:]
+            deck = np.append(spread, deck_new, axis=0)
+            get_spread(deck)
 
 get_spread(get_deck())
