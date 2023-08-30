@@ -71,6 +71,8 @@ def find_set(spread):
 
 
 def get_spread(deck):
+    if len(deck) == 0:
+        return print("Beautiful ending of zero cards, good fortune for you.")
     if len(deck) <= 12:
         spread = deck.copy()
         sets = find_set(spread)
@@ -84,7 +86,7 @@ def get_spread(deck):
                     if np.array_equiv(sets[k], card_of_moment):
                         indices[k] = int(i)
             spread = np.delete(spread, indices, axis=0)
-            get_spread(spread)
+            return get_spread(spread)
     elif len(deck) <= 15:
         spread = deck[:12]
         deck_new = deck[12:]
@@ -103,14 +105,14 @@ def get_spread(deck):
                         if np.array_equiv(sets[k], card_of_moment):
                             indices[k] = int(i)
                 spread = np.delete(spread, indices, axis=0)
-                get_spread(spread)
+                return get_spread(spread)
         else:
             for k in range(3):
                 for i in range(len(spread)):
                     if np.array_equiv(sets[k], spread[i]):
                         spread[i] = deck_new[k]
             deck_new = deck_new[3:]
-            get_spread(spread)
+            return get_spread(spread)
     elif len(deck) <= 18:
         spread = deck[12:]
         deck_new = deck[12:]
@@ -133,15 +135,15 @@ def get_spread(deck):
                             if np.array_equiv(sets[k], card_of_moment):
                                 indices[k] = int(i)
                     spread = np.delete(spread, indices, axis=0)
-                    get_spread(spread)
+                    return get_spread(spread)
             else:
                 for k in range(3):
                     for i in range(len(spread)):
                         if np.array_equiv(sets[k], spread[i]):
                             spread[i] = deck_new[k]
                 deck_new = deck_new[3:]
-                deck = np.concatenate(spread, deck_new, axis=0)
-                get_spread(deck)
+                deck = np.append(spread, deck_new, axis=0)
+                return get_spread(deck)
     else:
         spread = deck[:12]
         deck_new = deck[12:]
@@ -159,13 +161,15 @@ def get_spread(deck):
                     deck_new = deck_new[3:]
                     sets = find_set(spread)
                     indices = [0, 0, 0]
+                    if not sets:
+                        return print("Ummmmmm...")
                     for k in range(3):
                         for i in range(len(spread)):
                             if np.array_equiv(sets[k], spread[i]):
                                 indices[k] = i
                     spread = np.delete(spread, indices, axis=0)
                     deck = np.append(spread, deck_new, axis=0)
-                    get_spread(deck)
+                    return get_spread(deck)
                 else:
                     indices = [0, 0, 0]
                     for k in range(3):
@@ -174,7 +178,7 @@ def get_spread(deck):
                                 indices[k] = i
                     spread = np.delete(spread, indices, axis=0)
                     deck = np.append(spread, deck_new, axis=0)
-                    get_spread(deck)
+                    return get_spread(deck)
             else:
                 indices = [0, 0, 0]
                 for k in range(3):
@@ -183,7 +187,7 @@ def get_spread(deck):
                             indices[k] = i
                 spread = np.delete(spread, indices, axis=0)
                 deck = np.append(spread, deck_new, axis=0)
-                get_spread(deck)
+                return get_spread(deck)
         else:
             for k in range(3):
                 for i in range(len(spread)):
@@ -191,6 +195,6 @@ def get_spread(deck):
                         spread[i] = deck_new[k]
             deck_new = deck_new[3:]
             deck = np.append(spread, deck_new, axis=0)
-            get_spread(deck)
+            return get_spread(deck)
 
 get_spread(get_deck())
