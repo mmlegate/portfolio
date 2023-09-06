@@ -46,7 +46,7 @@ def get_deck():
 def find_set(spread):
     subsets = list(combo(spread, 3))
     if len(subsets) == 0:
-        return "End of Deck."
+        return []
     else:
         n = len(subsets)
         indices = np.zeros(n)
@@ -73,7 +73,7 @@ def find_set(spread):
 def get_spread(deck):
     if len(deck) == 0:
         return print("Beautiful ending of zero cards, good fortune for you.")
-    if len(deck) <= 12:
+    elif len(deck) <= 12:
         spread = deck.copy()
         sets = find_set(spread)
         if not sets:
