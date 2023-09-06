@@ -60,7 +60,7 @@ def find_set(spread):
                 break
             else:
                 continue
-        if not set_index:
+        if len(set_index) == 0:
             sets = []
         else:
             sets = subsets[int(set_index[0])]
@@ -71,7 +71,7 @@ def get_spread_end(spread, deck_new): #finishes game at point where sets are del
     if not chosen_set and len(deck_new) >= 3:
         return get_spreader(spread, deck_new)
     elif not chosen_set:
-        return "Kowabunga"
+        return print("Kowabunga")
     else:
         indices = [0, 0, 0]
         for i in range(len(spread)):
@@ -91,14 +91,14 @@ def get_spread(deck): #continues game at point where sets are replaced
     spread = deck[:12]
     deck_new = deck[12:]
     chosen_set = find_set(spread)
-    for i in range(3):
-        if not chosen_set and len(deck_new) >= 3:
+    for i in range(int(len(deck_new) / 3)):
+        if not chosen_set:
             spread, deck_new = get_spreader(spread, deck_new)
             chosen_set = find_set(spread)
         else:
             break
     if not chosen_set:
-        return "something is likely wrong with ur set finding function, because there has to be a set in this"
+        return print("game ends with 12", len(spread))
     elif len(deck_new) < 3:
          return get_spread_end(spread, deck_new)
     else:
