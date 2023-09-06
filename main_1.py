@@ -71,7 +71,7 @@ def get_spread_end(spread, deck_new): #finishes game at point where sets are del
     if not chosen_set and len(deck_new) >= 3:
         return get_spreader(spread, deck_new)
     elif not chosen_set:
-        return print("Kowabunga")
+        return print("game ends with", len(spread))
     else:
         indices = [0, 0, 0]
         for i in range(len(spread)):
@@ -98,7 +98,7 @@ def get_spread(deck): #continues game at point where sets are replaced
         else:
             break
     if not chosen_set:
-        return print("game ends with 12", len(spread))
+        return print("game ends with", len(spread))
     elif len(deck_new) < 3:
          return get_spread_end(spread, deck_new)
     else:
